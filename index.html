@@ -146,7 +146,7 @@ function home() {
       <p>Conceitos e contas sorteados, quatro ajudas (pular, cartas, universitários, placas) e a pergunta "Está certo disso?". Errar leva metade do que você já garantiu.</p>
       <button class="go" id="show">Jogar ${ICON.play}</button></div>
     <div class="tile"><h2>Treino livre</h2><p>Sem prêmio e sem pressa: a explicação aparece depois de cada resposta.</p>
-      <div class="chiprow"><button class="chipbtn" data-tr="conc">Só conceitos</button><button class="chipbtn" data-tr="num">Só contas</button><button class="chipbtn" data-tr="all">Tudo misturado</button></div></div>
+      <div class="chiprow"><button class="chipbtn" data-tr="conc">Só conceitos</button><button class="chipbtn" data-tr="num">Só estimativas</button><button class="chipbtn" data-tr="all">Tudo misturado</button></div></div>
     <label class="tswitch" for="tmr"><span>Cronômetro<small>Desligado por padrão. Ligado: 30 s até R$ 5 mil, 45 s até R$ 50 mil, 60 s depois</small></span><input type="checkbox" id="tmr" ${store.timer ? "checked" : ""}></label>
     <details class="tile how"><summary>Como funciona</summary><ol>
       <li>Cada degrau tem uma pergunta de dificuldade crescente: primeiro conceitos (qual hipótese vale em cada equipamento), depois contas e, no fim, ciclos completos.</li>
@@ -200,7 +200,7 @@ function renderShow() {
   }
   app.innerHTML = `
   <header class="top"><button class="iconbtn" id="back" aria-label="Sair do jogo">${ICON.back}</button>
-    <div class="ttl"><span class="kicker">Pergunta ${L + 1} de 16 · ${q.kind === "num" ? "Conta" : "Conceito"}</span><b>${money(LADDER[L])}</b></div>${muteBtn()}</header>
+    <div class="ttl"><span class="kicker">Pergunta ${L + 1} de 16 · ${q.kind === "num" ? "Estimativa" : "Conceito"}</span><b>${money(LADDER[L])}</b></div>${muteBtn()}</header>
   <div class="ladder" id="ladder">${steps}</div>
   <div class="stakes"><span class="down">Errar<b>${money(errValue())}</b></span><span>Parar<b>${money(stopValue())}</b></span><span class="up">Acertar<b>${money(LADDER[L])}</b></span></div>
   ${store.timer && c.state === "ask" ? `<div class="timer" id="tm"><i id="tbar" style="width:100%"></i><span id="ttxt">${c.limit} s</span></div>` : ""}
@@ -258,7 +258,7 @@ function useHelp(k) {
 function endShow(how, prize) {
   SOM.think(false); stopTimer();
   store.best = Math.max(store.best || 0, prize); save();
-  const rows = SH.log.map((l) => `<li class="${l.right ? "" : "badrow"}"><b>${money(LADDER[l.L])}</b> · ${l.q.kind === "num" ? "Conta" : "Conceito"}<div>${l.right ? "Acertou." : `Errou. Certa: <b>${"ABCD"[l.q.ans]}</b> · ${l.q.opts[l.q.ans]}`}</div><div class="why">${l.q.why}</div></li>`).join("");
+  const rows = SH.log.map((l) => `<li class="${l.right ? "" : "badrow"}"><b>${money(LADDER[l.L])}</b> · ${l.q.kind === "num" ? "Estimativa" : "Conceito"}<div>${l.right ? "Acertou." : `Errou. Certa: <b>${"ABCD"[l.q.ans]}</b> · ${l.q.opts[l.q.ans]}`}</div><div class="why">${l.q.why}</div></li>`).join("");
   const title = how === "milhão" ? "Você ganhou R$ 1 milhão!" : how === "parou" ? "Você parou" : how === "tempo" ? "O tempo acabou" : "Fim de jogo";
   app.innerHTML = `<header class="top"><button class="iconbtn" id="back" aria-label="Voltar ao início">${ICON.back}</button><div class="ttl"><span class="kicker">Show da Termo</span><b>${title}</b></div><span class="pill gold">${ICON.trophy}${money(store.best || 0)}</span></header>
   <main class="menu"><div class="big-score"><div class="trophy">${ICON.trophy}</div><span class="kicker">você leva</span><b>${money(prize)}</b><span class="kicker">recorde ${money(store.best || 0)}</span></div>
@@ -283,7 +283,7 @@ function renderTreino() {
   }).join("");
   const right = c.done && c.sel === q.ans;
   const fb = c.done ? `<div class="fb ${right ? "ok" : "bad"}"><b class="t">${right ? "Certo!" : "Não foi dessa vez"}</b>${right ? "" : `<div>Certa: <b>${"ABCD"[q.ans]}</b> · ${q.opts[q.ans]}</div>`}<div>${q.why}</div><div class="muted">Aparece em: ${q.src || "material de estudo da P2"}</div></div>` : "";
-  app.innerHTML = `<header class="top"><button class="iconbtn" id="back" aria-label="Voltar ao início">${ICON.back}</button><div class="ttl"><span class="kicker">Treino livre · ${q.kind === "num" ? "Conta" : "Conceito"}</span><b>${TR.ok} de ${TR.n} · sequência ${TR.streak}</b></div>${muteBtn()}</header>
+  app.innerHTML = `<header class="top"><button class="iconbtn" id="back" aria-label="Voltar ao início">${ICON.back}</button><div class="ttl"><span class="kicker">Treino livre · ${q.kind === "num" ? "Estimativa" : "Conceito"}</span><b>${TR.ok} de ${TR.n} · sequência ${TR.streak}</b></div>${muteBtn()}</header>
   <main class="play"><div class="card-q ${c.anim || ""}"><div class="q">${q.q}</div><div class="opts">${opts}</div>${fb}</div>
     <div class="dock">${c.done ? `<button class="btn gold" id="next">Próxima ${ICON.play}</button>` : `<button class="btn" id="home">Sair</button><button class="btn pri" id="ok" ${c.sel === null ? "disabled" : ""}>Responder</button>`}</div></main>`;
   c.anim = ""; bindMute(); $("back").onclick = home; if ($("home")) $("home").onclick = home;

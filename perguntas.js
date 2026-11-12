@@ -140,104 +140,306 @@ const CONC = [
 const GEN = [];
 const G = (tpl, d, fn) => GEN.push({ tpl, d, fn });
 
-G("n-ke", 4, () => {
-  const V = R.pick([50, 80, 120, 150, 200, 250, 300]), c = V * V / 2000;
-  return mk({ tpl: "n-ke", d: 4, kind: "num", q: `Um fluido escoa a <b>${V} m/s</b>. Qual a energia cinética específica V²/2, <b>em kJ/kg</b>?`,
-    ok: fm(c, c < 100 ? 2 : 1) + " kJ/kg", bad: [fm(V * V / 2) + " kJ/kg", fm(V * V / 200, 1) + " kJ/kg", fm(V * V / 20000, 3) + " kJ/kg"],
-    why: `V²/2 = ${V}²/2 = ${fm(V * V / 2)} J/kg = <b>${fm(c, 2)} kJ/kg</b> (divide por 1000).`, hint: "Lembre: V²/2 sai em J/kg e h está em kJ/kg.", src: "Vídeo T4-56" });
-});
-G("n-vol", 5, () => {
-  const T = R.pick([280, 290, 300, 310, 320]), Vd = R.pick([5, 8, 10, 12, 15, 20]), c = 100 * Vd / (RAR * T);
-  return mk({ tpl: "n-vol", d: 5, kind: "num", q: `Ar (gás ideal, R = 0,287 kJ/kg·K) a <b>100 kPa e ${T} K</b> com vazão volumétrica de <b>${Vd} m³/s</b>. Qual a vazão mássica?`,
-    ok: fm(c, 1) + " kg/s", bad: [fm(100 * Vd / (RAR * (T - 273)), 1) + " kg/s", fm(100 * Vd / (8.314 * T), 1) + " kg/s", fm(100 * Vd / T, 1) + " kg/s"],
-    why: `ṁ = PV̇/(RT) = 100 · ${Vd}/(0,287 · ${T}) = <b>${fm(c, 1)} kg/s</b> (T em kelvin).`, hint: "Gás ideal: PV̇ = ṁRT, com T absoluta.", src: "Prova 2 de 03/07, Q2" });
-});
-G("n-misturah", 5, () => {
-  const x = R.pick([0.8, 0.84, 0.88, 0.92, 0.94, 0.96]), hl = 191.81, hlv = 2392.82, hv = 2584.63, c = hl + x * hlv;
-  return mk({ tpl: "n-misturah", d: 5, kind: "num", q: `Água a <b>10 kPa</b> com título <b>x = ${fm(x, 2)}</b>. Dados: h<sub>l</sub> = 191,81, h<sub>lv</sub> = 2392,82 e h<sub>v</sub> = 2584,63 kJ/kg. Qual a entalpia h?`,
-    ok: fm(c, 1) + " kJ/kg", bad: [fm(x * hlv, 1) + " kJ/kg", fm(hl + (1 - x) * hlv, 1) + " kJ/kg", fm(x * hv, 1) + " kJ/kg"],
-    why: `h = h<sub>l</sub> + x·h<sub>lv</sub> = 191,81 + ${fm(x, 2)} · 2392,82 = <b>${fm(c, 1)} kJ/kg</b>.`, hint: "h = h_l + x·h_lv.", src: "Vídeo R4-118, Passo 3" });
-});
-G("n-interp", 6, () => {
-  const [a, b] = R.pick([[3316.15, 3433.76], [3301.76, 3422.12]]), T = R.pick([460, 470, 480, 490]), f = (T - 450) / 50, c = a + f * (b - a);
-  return mk({ tpl: "n-interp", d: 6, kind: "num", q: `Numa tabela, h vale <b>${fm(a, 2)} kJ/kg a 450 °C</b> e <b>${fm(b, 2)} kJ/kg a 500 °C</b> (mesma pressão). Interpole linearmente h a <b>${T} °C</b>.`,
-    ok: fm(c, 1) + " kJ/kg", bad: [fm(a + (1 - f) * (b - a), 1) + " kJ/kg", fm((a + b) / 2, 1) + " kJ/kg", fm(a + (T - 450) * (b - a) / 100, 1) + " kJ/kg"],
-    why: `Fração = (${T} − 450)/50 = ${fm(f, 1)}. h = ${fm(a, 2)} + ${fm(f, 1)} · (${fm(b, 2)} − ${fm(a, 2)}) = <b>${fm(c, 1)} kJ/kg</b>.`, hint: "h = h₁ + fração · (h₂ − h₁), fração = (T − 450)/50.", src: "Vídeo R4-118, Passo 2" });
-});
-G("n-turbar", 6, () => {
-  const m = R.pick([2, 3, 5, 8, 10, 12]), dT = R.pick([200, 250, 300, 350, 400]), T1 = R.pick([900, 1000, 1100, 1200]), c = m * CP * dT;
-  return mk({ tpl: "n-turbar", d: 6, kind: "num", q: `Turbina de ar adiabática, <b>${m} kg/s</b>, entra a <b>${T1} K</b> e sai a <b>${T1 - dT} K</b> (cp = 1,005 kJ/kg·K). Qual a potência?`,
-    ok: fm(c) + " kW", bad: [fm(m * CV * dT) + " kW", fm(CP * dT) + " kW", fm(c * 1000) + " kW"],
-    why: `Ẇ = ṁ·cp·(T₁ − T₂) = ${m} · 1,005 · ${dT} = <b>${fm(c)} kW</b>.`, hint: "Turbina adiabática de gás ideal: Ẇ = ṁ·cp·ΔT.", src: "Vídeo T4-46" });
-});
-G("n-compke", 7, () => {
-  const W = R.pick([3000, 4000, 5000, 6000]), dT = R.pick([300, 350, 400, 410, 450]), V = R.pick([90, 100, 120, 150]), ke = V * V / 2000, c = W / (CP * dT + ke);
-  return mk({ tpl: "n-compke", d: 7, kind: "num", q: `Compressor adiabático de ar (cp = 1,005): potência de acionamento <b>${fm(W)} kW</b>, o ar sobe <b>${dT} K</b> e sai a <b>${V} m/s</b> (entra com V ≈ 0). Qual a vazão mássica?`,
-    ok: fm(c, 2) + " kg/s", bad: [fm(W / (CP * dT), 2) + " kg/s", fm(W / (CP * dT + V * V / 2), 2) + " kg/s", fm(W / (CP * dT - ke), 2) + " kg/s"],
-    why: `ṁ = Ẇ/(cp·ΔT + V²/2) = ${fm(W)}/(${fm(CP * dT, 1)} + ${fm(ke, 2)}) = <b>${fm(c, 2)} kg/s</b>. A energia cinética soma (÷1000).`, hint: "O trabalho que entra vira entalpia mais energia cinética.", src: "Vídeo T4-56" });
-});
-G("n-extrac", 7, () => {
-  const m = R.pick([4, 5, 6, 8, 10]), f = R.pick([0.1, 0.15, 0.2, 0.25, 0.3]), h1 = 3456.48, h2 = 3157.65, h3 = 2870.46;
-  const c = m * h1 - f * m * h2 - (1 - f) * m * h3;
-  return mk({ tpl: "n-extrac", d: 7, kind: "num", q: `Turbina a vapor adiabática recebe <b>${m} kg/s</b> (h<sub>1</sub> = 3456,5 kJ/kg). <b>${fm(f * 100)}%</b> é extraído (h<sub>2</sub> = 3157,7) e o resto sai com h<sub>3</sub> = 2870,5. Qual a potência?`,
-    ok: fm(c) + " kW", bad: [fm(m * (h1 - h3)) + " kW", fm(m * h1 - f * m * h3 - (1 - f) * m * h2) + " kW", fm(m * h1 - m * h2 - m * h3) + " kW"],
-    why: `ṁ₂ = ${fm(f * m, 2)} e ṁ₃ = ${fm((1 - f) * m, 2)} kg/s. Ẇ = ṁ₁h₁ − ṁ₂h₂ − ṁ₃h₃ = <b>${fm(c)} kW</b>.`, hint: "Primeiro a massa: ṁ₃ = ṁ₁ − ṁ₂. Depois cada saída com sua entalpia.", src: "Vídeo T4-84" });
-});
-G("n-cond", 7, () => {
-  const mv = R.pick([0.5, 1, 2, 3]), x = R.pick([0.9, 0.92, 0.95]), dT = R.pick([8, 10, 12, 15]), hlv = 2392.82, c = mv * x * hlv / (4.18 * dT);
-  return mk({ tpl: "n-cond", d: 7, kind: "num", q: `Condensador isolado: <b>${fm(mv, 1)} kg/s</b> de vapor a 10 kPa com <b>x = ${fm(x, 2)}</b> sai como líquido saturado (h<sub>lv</sub> = 2392,8 kJ/kg). A água de resfriamento (cp = 4,18) sobe <b>${dT} K</b>. Qual a vazão da água?`,
-    ok: fm(c, 1) + " kg/s", bad: [fm(mv * hlv / (4.18 * dT), 1) + " kg/s", fm(mv * x * hlv / 4.18, 1) + " kg/s", fm(mv * (1 - x) * hlv / (4.18 * dT), 1) + " kg/s"],
-    why: `O vapor perde x·h<sub>lv</sub> = ${fm(x * hlv, 1)} kJ/kg. ṁ<sub>a</sub> = ${fm(mv, 1)} · ${fm(x * hlv, 1)}/(4,18 · ${dT}) = <b>${fm(c, 1)} kg/s</b>.`, hint: "Calor que o vapor perde = calor que a água ganha.", src: "Vídeos T4-91 e R4-119" });
-});
-G("n-pumph", 8, () => {
-  const Wp = R.pick([200, 250, 300, 400]), m = R.pick([20, 25, 40, 50]), h7 = R.pick([168, 190, 200]), c = h7 + Wp / m;
-  return mk({ tpl: "n-pumph", d: 8, kind: "num", q: `Bomba adiabática, vazão <b>${m} kg/s</b>, potência de acionamento <b>${Wp} kW</b>. A entalpia na entrada é <b>${h7} kJ/kg</b>. Qual a entalpia na saída?`,
-    ok: fm(c, 1) + " kJ/kg", bad: [fm(h7 - Wp / m, 1) + " kJ/kg", fm(h7 + Wp * m) + " kJ/kg", fm(h7 + Wp) + " kJ/kg"],
-    why: `h<sub>s</sub> = h<sub>e</sub> + Ẇ/ṁ = ${h7} + ${Wp}/${m} = <b>${fm(c, 1)} kJ/kg</b>.`, hint: "A bomba entrega Ẇ/ṁ de entalpia por quilo.", src: "Vídeo R4-119-120, Passo 5" });
-});
-G("n-vel", 8, () => {
-  const m = R.pick([10, 25, 40]), v = R.pick([0.0602, 0.0616, 0.0733, 0.0548]), D = R.pick([0.15, 0.2, 0.25]), A = Math.PI * D * D / 4, c = m * v / A;
-  return mk({ tpl: "n-vel", d: 8, kind: "num", q: `Vapor escoa a <b>${m} kg/s</b> num tubo de <b>${fm(D * 1000)} mm</b> de diâmetro, com v = <b>${fm(v, 4)} m³/kg</b>. Qual a velocidade?`,
-    ok: fm(c, 1) + " m/s", bad: [fm(4 * m * v / (Math.PI * D), 1) + " m/s", fm(m * v / (Math.PI * D * D), 1) + " m/s", fm(m / (v * A), 0) + " m/s"],
-    why: `A = π·${fm(D, 2)}²/4 = ${fm(A, 4)} m². V = ṁ·v/A = ${m} · ${fm(v, 4)}/${fm(A, 4)} = <b>${fm(c, 1)} m/s</b>.`, hint: "V = ṁ·v/A, com A = πD²/4 e D em metros.", src: "Vídeo R4-118, Passo 2" });
-});
 function braytonTs() {
   const T1 = R.pick([290, 300, 320]), T2 = T1 + R.pick([60, 70, 80, 100]), T3 = R.pick([1100, 1200, 1300]), T4 = T3 - R.pick([500, 550, 600, 650]);
   return { T1, T2, T3, T4, m: R.pick([5, 8, 10, 12, 15]) };
 }
 const brayStmt = (b) => `Brayton com ar (cp = 1,005 kJ/kg·K), <b>${b.m} kg/s</b>: T<sub>1</sub> = ${b.T1} K (entrada do compressor), T<sub>2</sub> = ${b.T2} K, T<sub>3</sub> = ${b.T3} K (entrada da turbina) e T<sub>4</sub> = ${b.T4} K.`;
-G("n-brayQ", 8, () => {
-  const b = braytonTs(), c = b.m * CP * (b.T3 - b.T2);
-  return mk({ tpl: "n-brayQ", d: 8, kind: "num", q: brayStmt(b) + " Qual o calor recebido no aquecedor (2 → 3)?",
-    ok: fm(c) + " kW", bad: [fm(b.m * CP * (b.T4 - b.T1)) + " kW", fm(b.m * CP * (b.T3 - b.T1)) + " kW", fm(b.m * CP * (b.T3 - b.T4)) + " kW"],
-    why: `Q̇<sub>H</sub> = ṁ·cp·(T₃ − T₂) = ${b.m} · 1,005 · ${b.T3 - b.T2} = <b>${fm(c)} kW</b>.`, hint: "O aquecedor liga a saída do compressor (2) à entrada da turbina (3).", src: "Prova 2 de 03/07, Q2" });
+
+/* ---------------- variações v2: equipamento, fluido, ciclo e molde de pergunta sorteados ---------------- */
+const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+const nd3 = (c) => (Math.abs(c) < 1 ? 3 : Math.abs(c) < 10 ? 2 : 1);
+const sgn = (v, nd = 0) => (v > 0 ? "+" : "") + fm(v, nd);
+const GASES = [
+  { n: "ar", R: 0.287, Rs: "0,287", cp: 1.005, cps: "1,005" },
+  { n: "nitrogênio", R: 0.2968, Rs: "0,2968", cp: 1.039, cps: "1,039" },
+  { n: "hélio", R: 2.077, Rs: "2,077", cp: 5.193, cps: "5,193" },
+  { n: "CO₂", R: 0.1889, Rs: "0,1889", cp: 0.842, cps: "0,842" },
+];
+
+
+G("n-unid", 2, () => {
+  const L = [
+    ["ṁ em kg/s multiplicada por h em kJ/kg", "kW", ["kJ", "W", "MW"]],
+    ["P em kPa multiplicada por V̇ em m³/s", "kW", ["kJ/kg", "MW", "W"]],
+    ["ṁ em kg/s multiplicada por cp em kJ/kg·K e por ΔT em K", "kW", ["kJ/kg", "kJ", "W"]],
+    ["V²/2 com V em m/s (sem converter nada)", "J/kg", ["kJ/kg", "W", "m²"]],
+    ["P em kPa multiplicada por V em m³ (volume)", "kJ", ["kW", "kJ/kg", "J/kg"]],
+  ];
+  const [d, ok, bad] = R.pick(L);
+  return mk({ tpl: "n-unid", d: 2, kind: "conc", q: `Qual é a unidade de: <b>${d}</b>?`, ok, bad: [...bad, "N·m"],
+    why: "kg/s · kJ/kg = kJ/s = kW. kPa · m³/s = kJ/s = kW. V²/2 em (m/s)² dá J/kg, então para kJ/kg divide por 1000.", hint: "Faça a análise dimensional.", src: "Formulário" });
 });
-G("n-brayW", 8, () => {
-  const b = braytonTs(), Wt = b.m * CP * (b.T3 - b.T4), Wc = b.m * CP * (b.T2 - b.T1), c = Wt - Wc;
-  return mk({ tpl: "n-brayW", d: 8, kind: "num", q: brayStmt(b) + " Qual a potência líquida do ciclo?",
-    ok: fm(c) + " kW", bad: [fm(Wt + Wc) + " kW", fm(Wt) + " kW", fm(b.m * CP * (b.T3 - b.T2)) + " kW"],
-    why: `Ẇ<sub>T</sub> = ${fm(Wt)} kW, Ẇ<sub>c</sub> = ${fm(Wc)} kW. Ẇ<sub>líq</sub> = Ẇ<sub>T</sub> − Ẇ<sub>c</sub> = <b>${fm(c)} kW</b>.`, hint: "O compressor consome parte da turbina.", src: "Prova 2 de 03/07, Q2" });
+const TERMOS = [
+  ["uma turbina a vapor adiabática", "A", "Adiabática zera o calor, mas a turbina tem eixo: sobra Ẇ."],
+  ["um compressor adiabático de ar", "A", "Adiabático zera Q̇; o eixo entrega trabalho ao gás (Ẇ < 0)."],
+  ["uma bomba adiabática de água", "A", "Q̇ = 0, mas a bomba recebe potência pelo eixo."],
+  ["a caldeira (gerador de vapor)", "B", "Troca calor com a fornalha e não tem eixo: Ẇ = 0."],
+  ["o condensador de um Rankine", "B", "Só rejeita calor para a água de resfriamento, sem eixo."],
+  ["o resfriador de um Brayton fechado", "B", "Só cede calor ao ambiente, sem eixo."],
+  ["uma válvula adiabática", "C", "Sem eixo e sem troca de calor: Q̇ = 0 e Ẇ = 0 (h₁ = h₂)."],
+  ["um bocal adiabático", "C", "Sem eixo e sem calor: a queda de h vira energia cinética."],
+  ["uma câmara de mistura adiabática", "C", "Sem eixo e sem calor: Σṁh na entrada = ṁh na saída."],
+  ["um trocador de calor, com as duas correntes dentro do VC", "C", "O calor passa de uma corrente à outra dentro do VC: Q̇ = 0 e Ẇ = 0."],
+  ["uma turbina que perde calor para o ambiente", "D", "Tem eixo (Ẇ ≠ 0) e perda de calor (Q̇ < 0)."],
+  ["um compressor refrigerado por camisa de água", "D", "Tem eixo (Ẇ < 0) e cede calor à camisa (Q̇ < 0)."],
+];
+const TER_TXT = { A: "Q̇ = 0 e Ẇ ≠ 0", B: "Q̇ ≠ 0 e Ẇ = 0", C: "Q̇ = 0 e Ẇ = 0", D: "Q̇ ≠ 0 e Ẇ ≠ 0" };
+G("e-termos", 2, () => {
+  const [eq, k, why] = R.pick(TERMOS);
+  return mk({ tpl: "e-termos", d: 2, q: `Na 1ª lei em regime permanente, qual caso descreve <b>${eq}</b>?`, ok: TER_TXT[k], bad: Object.keys(TER_TXT).filter((x) => x !== k).map((x) => TER_TXT[x]),
+    why, hint: why, src: "Roteiro: identificar o equipamento e cortar termos" });
 });
-G("n-eta", 9, () => {
-  const eta = R.pick([0.3, 0.32, 0.35, 0.38, 0.4]), Wt = R.pick([20000, 24800, 25000, 30000]), Wb = R.pick([300, 500, 800]), QH = Math.round((Wt - Wb) / eta / 10) * 10, e = (Wt - Wb) / QH;
-  return mk({ tpl: "n-eta", d: 9, kind: "num", q: `Rankine: turbina <b>${fm(Wt)} kW</b>, bomba <b>${fm(Wb)} kW</b> (consome) e calor na caldeira + economizador <b>${fm(QH)} kW</b>. Qual a eficiência térmica?`,
-    ok: fm(e * 100, 1) + " %", bad: [fm(Wt / QH * 100, 1) + " %", fm((Wt + Wb) / QH * 100, 1) + " %", fm((QH - (Wt - Wb)) / QH * 100, 1) + " %"],
-    why: `η = (Ẇ<sub>T</sub> − Ẇ<sub>P</sub>)/Q̇<sub>H</sub> = (${fm(Wt)} − ${fm(Wb)})/${fm(QH)} = <b>${fm(e * 100, 1)} %</b>.`, hint: "Potência líquida dividida pelo calor que entra.", src: "Vídeo R4-119-120" });
+const SATW = [{ P: "10 kPa", Ts: 45.8 }, { P: "50 kPa", Ts: 81.3 }, { P: "100 kPa", Ts: 99.6 }, { P: "500 kPa", Ts: 151.9 }, { P: "1 MPa", Ts: 179.9 }, { P: "2 MPa", Ts: 212.4 }, { P: "5 MPa", Ts: 264.0 }];
+G("e-estado", 3, () => {
+  const s = R.pick(SATW), caso = R.pick(["L", "V", "S"]);
+  const T = caso === "L" ? Math.round(s.Ts) - R.pick([15, 25, 35]) : caso === "V" ? Math.round(s.Ts) + R.pick([30, 60, 100]) : s.Ts;
+  const O = { L: "Líquido comprimido: h ≈ h<sub>l</sub>(T), da tabela de saturação", V: "Vapor superaquecido: tabela de superaquecido com P e T", S: "No limite da saturação: P e T não bastam, falta o título x", G: "Gás ideal: h = cp·T" };
+  return mk({ tpl: "e-estado", d: 3, q: `Água a <b>${s.P}</b> e <b>${fm(T, caso === "S" ? 1 : 0)} °C</b> (T<sub>sat</sub> a ${s.P} = ${fm(s.Ts, 1)} °C). Como obter h?`, ok: O[caso], bad: Object.keys(O).filter((x) => x !== caso).map((x) => O[x]),
+    why: `Compare T com T<sub>sat</sub>(P): abaixo é líquido comprimido, acima é vapor superaquecido e igual é saturado (precisa de x). Aqui: ${fm(T, 1)} ${caso === "L" ? "<" : caso === "V" ? ">" : "="} ${fm(s.Ts, 1)}.`, hint: "Compare T com Tsat(P).", src: "Roteiro de tabelas (4.119)" });
 });
-G("n-fecha", 9, () => {
-  const Wc = R.pick([300, 600, 900, 1200, 1500]), Wt = Wc * R.pick([5, 6, 7, 8]), QL = R.pick([2000, 3000, 4000, 5000]) , QH = Wt - Wc + QL;
-  return mk({ tpl: "n-fecha", d: 9, kind: "num", q: `Num ciclo Brayton: Q̇<sub>H</sub> = <b>${fm(QH)} kW</b>, Ẇ<sub>T</sub> = <b>${fm(Wt)} kW</b> e Ẇ<sub>c</sub> = <b>${fm(Wc)} kW</b>. Qual o calor rejeitado (módulo)?`,
-    ok: fm(QL) + " kW", bad: [fm(QH - Wt) + " kW", fm(QH - Wt - Wc) + " kW", fm(Wt - Wc) + " kW"],
-    why: `ΣQ̇ = ΣẆ: Q̇<sub>H</sub> − |Q̇<sub>L</sub>| = Ẇ<sub>T</sub> − Ẇ<sub>c</sub>. |Q̇<sub>L</sub>| = ${fm(QH)} − (${fm(Wt)} − ${fm(Wc)}) = <b>${fm(QL)} kW</b>.`, hint: "Calor líquido = potência líquida.", src: "Quadro e lousa" });
+G("e-hip", 6, () => {
+  const eq = R.pick([["turbina a vapor", "Δh entre entrada e saída"], ["turbina a gás", "Δh entre entrada e saída"], ["compressor de ar", "Δh entre entrada e saída"]]);
+  const dh = R.pick([300, 500]), V2 = R.pick([60, 100, 250, 300]), ke = V2 * V2 / 2000, pct = ke / dh * 100, ok = pct < 3;
+  const txt = (s) => `${s} (ΔEc = ${fm(ke, 1)} kJ/kg, ou ${fm(pct, 1)} % de Δh)`;
+  return mk({ tpl: "e-hip", d: 6, q: `Numa ${eq[0]}, o ${eq[1]} é <b>${dh} kJ/kg</b> e o fluido entra com V ≈ 0 e sai a <b>${V2} m/s</b>. Dá para desprezar a variação de energia cinética?`,
+    ok: txt(ok ? "Sim, é desprezível" : "Não, precisa entrar no balanço"), bad: [txt(ok ? "Não, precisa entrar no balanço" : "Sim, é desprezível"), "Sim, em turbinas e compressores a energia cinética é sempre desprezível", "Não, pois a variação de energia potencial é que domina"],
+    why: `ΔEc = V²/2 = ${V2}²/2000 = ${fm(ke, 1)} kJ/kg, ${fm(pct, 1)} % de ${dh}. ${ok ? "Erro de poucos por cento: dá para desprezar." : "É uma fração grande: entra na conta."}`, hint: "Regra de bolso: 45 m/s ≈ 1 kJ/kg.", src: "CADERNO_P2_Termo" });
 });
-G("n-carnot", 9, () => {
-  const TH = R.pick([1200, 1500, 1800, 2000]), TL = R.pick([290, 300]), eC = 1 - TL / TH, imp = Math.random() < 0.5;
-  const eta = imp ? Math.min(0.97, eC + R.pick([0.02, 0.03, 0.04])) : eC - R.pick([0.1, 0.15, 0.2]), QH = 10000, QL = Math.round(QH * (1 - eta));
-  const e2 = 1 - QL / QH, bad = e2 > eC;
-  return mk({ tpl: "n-carnot", d: 9, kind: "num", q: `Máquina entre <b>${TH} K</b> e <b>${TL} K</b>: Q̇<sub>H</sub> = <b>${fm(QH)} kW</b> e |Q̇<sub>L</sub>| = <b>${fm(QL)} kW</b>. Ela é possível?`,
-    ok: bad ? "Impossível: η supera o limite de Carnot" : "Possível: η está abaixo do limite de Carnot",
-    bad: [bad ? "Possível: η está abaixo do limite de Carnot" : "Impossível: η supera o limite de Carnot", "Possível, pois η < 1 sempre basta", "Impossível, pois Q̇<sub>L</sub> não pode ser positivo"],
-    why: `η = 1 − ${fm(QL)}/${fm(QH)} = ${fm(e2, 3)}; η<sub>Carnot</sub> = 1 − ${TL}/${TH} = ${fm(eC, 3)}. ${bad ? "η > η<sub>Carnot</sub>: impossível." : "η < η<sub>Carnot</sub>: possível."}`, hint: "Compare η = 1 − QL/QH com 1 − TL/TH.", src: "Lousa de 11/11" });
+const ERRO = [
+  ["turbina de vapor adiabática, 1 entrada e 1 saída", [
+    ["Regime permanente: dE/dt = 0 e ṁ<sub>e</sub> = ṁ<sub>s</sub>", "Regime permanente: entra mais massa do que sai, pois o vapor expande"],
+    ["Adiabática: Q̇ = 0", "Adiabática: Ẇ = 0"],
+    ["Sem Ec e Ep: Ẇ = ṁ(h<sub>e</sub> − h<sub>s</sub>)", "Sem Ec e Ep: Ẇ = ṁ(h<sub>s</sub> − h<sub>e</sub>)"],
+    ["h<sub>s</sub> vem da tabela, com a pressão de saída e o título", "h<sub>s</sub> vem da tabela, com a pressão de entrada e o título de saída"]]],
+  ["compressor de ar adiabático", [
+    ["Regime permanente: ṁ<sub>e</sub> = ṁ<sub>s</sub>", "Regime permanente: ṁ<sub>s</sub> = 2ṁ<sub>e</sub>, pois o ar é comprimido"],
+    ["Adiabático: Q̇ = 0", "Adiabático: Q̇ < 0, pois o ar esquenta ao ser comprimido"],
+    ["Gás ideal: Δh = cp·(T<sub>2</sub> − T<sub>1</sub>)", "Gás ideal: h depende de T e de P, então preciso de P<sub>2</sub>"],
+    ["Ẇ = ṁ·cp·(T<sub>1</sub> − T<sub>2</sub>) < 0: a potência entra no gás", "Ẇ = ṁ·cp·(T<sub>2</sub> − T<sub>1</sub>) > 0: o compressor consome energia"]]],
+  ["válvula adiabática com água", [
+    ["Sem eixo: Ẇ = 0", "Tem uma restrição ao escoamento, então Ẇ < 0"],
+    ["Rápida e sem troca de calor: Q̇ ≈ 0", "A pressão cai, o fluido esfria e Q̇ < 0"],
+    ["Seções parecidas: ΔEc desprezível", "A velocidade cai muito, então ΔEc é o termo principal"],
+    ["Logo h<sub>1</sub> = h<sub>2</sub>", "Logo s<sub>1</sub> = s<sub>2</sub>"]]],
+  ["trocador de calor com duas correntes, sem perda ao ambiente", [
+    ["VC = trocador inteiro: Q̇ = 0 e Ẇ = 0", "VC = trocador inteiro: Q̇ > 0, pois uma corrente é quente"],
+    ["Cada corrente conserva a sua vazão de massa", "Em todo trocador ṁ<sub>quente</sub> = ṁ<sub>fria</sub>"],
+    ["Energia: ṁ<sub>q</sub>(h<sub>q1</sub> − h<sub>q2</sub>) = ṁ<sub>f</sub>(h<sub>f2</sub> − h<sub>f1</sub>)", "Energia: ṁ<sub>q</sub>(h<sub>q1</sub> − h<sub>q2</sub>) = ṁ<sub>f</sub>(h<sub>f1</sub> − h<sub>f2</sub>)"],
+    ["Com cp constante: ṁ<sub>q</sub>·cp<sub>q</sub>·ΔT<sub>q</sub> = ṁ<sub>f</sub>·cp<sub>f</sub>·ΔT<sub>f</sub>", "Com cp constante: ΔT<sub>q</sub> = ΔT<sub>f</sub>, pois a energia se conserva"]]],
+  ["bocal adiabático de gás", [
+    ["Sem eixo e adiabático: Ẇ = 0 e Q̇ = 0", "O bocal acelera o gás, logo Ẇ > 0"],
+    ["Energia: h<sub>s</sub> + V<sub>s</sub>²/2 = h<sub>e</sub> + V<sub>e</sub>²/2", "Energia: h<sub>s</sub> + V<sub>s</sub>² = h<sub>e</sub> + V<sub>e</sub>²"],
+    ["V²/2 sai em J/kg: divide por 1000 para ter kJ/kg", "V²/2 sai em J/kg: multiplica por 1000 para ter kJ/kg"],
+    ["Se V aumenta, h diminui", "Se V aumenta, h também aumenta"]]],
+  ["condensador de um Rankine", [
+    ["Sem eixo: Ẇ = 0", "O condensador é adiabático: Q̇ = 0"],
+    ["Saída: líquido saturado na pressão do condensador (x = 0)", "Saída: vapor saturado na pressão do condensador (x = 1)"],
+    ["Q̇ = ṁ(h<sub>s</sub> − h<sub>e</sub>) < 0: o calor sai do vapor", "Q̇ = ṁ(h<sub>s</sub> − h<sub>e</sub>) > 0: o vapor ganha calor"],
+    ["Entrando a 200 m/s, V²/2 = 20 kJ/kg entra na conta", "Entrando a 200 m/s, V²/2 = 20 000 kJ/kg entra na conta"]]],
+];
+G("e-erro", 9, () => {
+  const [eq, steps] = R.pick(ERRO), k = R.int(0, 3), lines = steps.map((s, i) => `Passo ${i + 1}: ${i === k ? s[1] : s[0]}`);
+  return mk({ tpl: "e-erro", d: 9, q: `Resolução do equipamento: <b>${eq}</b>. Em qual passo está o <b>erro</b>?`, ok: lines[k], bad: lines.filter((_, i) => i !== k),
+    why: `O correto seria: <b>${steps[k][0]}</b>.`, hint: "Releia cada passo: um deles contradiz a 1ª lei ou a convenção de sinais.", src: "Roteiro: identificar o equipamento e cortar termos" });
+});
+const ESE = [
+  ["Uma bomba adiabática de água mantém a potência de acionamento Ẇ. A vazão ṁ passa a ser <b>{k} vezes maior</b>. O que acontece com o aumento de entalpia por quilo (h<sub>s</sub> − h<sub>e</sub>)?", "1/k", "Ẇ = ṁ·Δh: com Ẇ fixa, mais vazão significa menos Δh por quilo."],
+  ["Vapor escoa num tubo com ṁ e v (volume específico) fixos. O diâmetro passa a ser <b>{k} vezes maior</b>. O que acontece com a velocidade do vapor?", "1/k2", "V = ṁ·v/A e a área cresce com D²."],
+  ["Uma turbina de ar opera com ṁ, T<sub>1</sub> e T<sub>2</sub> fixos. A vazão ṁ passa a ser <b>{k} vezes maior</b>. O que acontece com a <b>potência</b>?", "k", "Ẇ = ṁ·cp·ΔT é linear em ṁ."],
+  ["Um aquecedor de gás (cp constante) mantém ṁ. A elevação de temperatura ΔT passa a ser <b>{k} vezes maior</b>. O que acontece com Q̇?", "k", "Q̇ = ṁ·cp·ΔT é linear em ΔT."],
+  ["Num bocal com V<sub>entrada</sub> ≈ 0, a velocidade de saída passa a ser <b>{k} vezes maior</b>. O que acontece com a <b>energia cinética específica</b> V²/2 na saída?", "k2", "V²/2 vai com o quadrado da velocidade."],
+  ["Um gás ideal escoa com V̇ e T fixos. A pressão passa a ser <b>{k} vezes maior</b>. O que acontece com a vazão mássica ṁ = PV̇/(RT)?", "k", "ṁ é proporcional a P."],
+  ["Um gás ideal escoa com P e V̇ fixos. A temperatura <b>absoluta</b> passa a ser <b>{k} vezes maior</b>. O que acontece com ṁ = PV̇/(RT)?", "1/k", "ṁ é inversamente proporcional a T."],
+  ["Num compressor adiabático de ar com ΔT fixo, a vazão ṁ passa a ser <b>{k} vezes maior</b>. O que acontece com a <b>potência de acionamento</b>?", "k", "A potência é ṁ·cp·ΔT: dobra com ṁ."],
+  ["Numa turbina com entalpias de entrada e saída fixas, a vazão ṁ passa a ser <b>{k} vezes maior</b>. O que acontece com o <b>trabalho específico</b> Ẇ/ṁ = h<sub>e</sub> − h<sub>s</sub>?", "1", "Ẇ/ṁ depende só das entalpias, não da vazão."],
+];
+G("e-ese", 5, () => {
+  const [t, f, why] = R.pick(ESE), k = R.pick([2, 3, 4]);
+  const O = { k: `Fica ${k} vezes maior`, k2: `Fica ${k * k} vezes maior`, "1/k": `Fica ${k} vezes menor`, "1/k2": `Fica ${k * k} vezes menor`, "1": "Não muda" }, ans = f;
+  return mk({ tpl: "e-ese", d: 5, q: t.replace("{k}", k), ok: O[ans], bad: Object.keys(O).filter((x) => x !== ans).map((x) => O[x]),
+    why: `${why} Com fator ${k}: ${O[ans].toLowerCase()}.`, hint: why, src: "Equação da 1ª lei para VC" });
+});
+
+/* ---------------- intuição: sinal, direção, comparação e ordem de grandeza (sem conta) ---------------- */
+const OPC4 = ["Positivo", "Negativo", "Zero", "Depende só da pressão de saída"];
+const SINAL = [
+  ["a turbina", "Ẇ", "Positivo", "A turbina entrega potência pelo eixo: Ẇ > 0 na convenção do formulário."],
+  ["o compressor", "Ẇ", "Negativo", "O compressor recebe potência: Ẇ < 0."],
+  ["a bomba", "Ẇ", "Negativo", "A bomba recebe potência: Ẇ < 0."],
+  ["a caldeira", "Ẇ", "Zero", "Não tem eixo: Ẇ = 0."],
+  ["o condensador", "Ẇ", "Zero", "Não tem eixo: Ẇ = 0."],
+  ["uma válvula adiabática", "Ẇ", "Zero", "Sem eixo: Ẇ = 0 (e Q̇ = 0)."],
+  ["a caldeira", "Q̇", "Positivo", "Recebe calor da fornalha: Q̇ > 0."],
+  ["o condensador", "Q̇", "Negativo", "O vapor cede calor à água de resfriamento: Q̇ < 0."],
+  ["o resfriador de um Brayton fechado", "Q̇", "Negativo", "O gás cede calor ao ambiente: Q̇ < 0."],
+  ["o aquecedor (câmara de combustão) de um Brayton", "Q̇", "Positivo", "O gás recebe calor: Q̇ > 0."],
+  ["uma turbina adiabática", "Q̇", "Zero", "Adiabática significa Q̇ = 0."],
+];
+G("e-sinal", 2, () => {
+  const [eq, q, ok, why] = R.pick(SINAL);
+  return mk({ tpl: "e-sinal", d: 2, q: `Na convenção do formulário (Q̇ entra e Ẇ sai são positivos), qual o sinal de <b>${q}</b> em <b>${eq}</b>?`, ok, bad: OPC4.filter((x) => x !== ok), why, hint: why, src: "Formulário da prova" });
+});
+const DIRE = [
+  ["um bocal adiabático de gás ideal", "a velocidade do gás", "Aumenta", "A queda de h vira energia cinética."],
+  ["um bocal adiabático de gás ideal", "a temperatura do gás", "Diminui", "h cai, e para gás ideal h depende só de T."],
+  ["um difusor adiabático de gás ideal", "a velocidade do gás", "Diminui", "O difusor freia o escoamento."],
+  ["um difusor adiabático de gás ideal", "a temperatura do gás", "Aumenta", "A energia cinética vira entalpia, e T sobe."],
+  ["uma válvula adiabática de gás ideal", "a temperatura do gás", "Permanece constante", "h₁ = h₂ e h = h(T): a temperatura não muda."],
+  ["uma válvula adiabática", "a entalpia do fluido", "Permanece constante", "Q̇ = 0, Ẇ = 0 e Ec desprezível: h₁ = h₂."],
+  ["um compressor adiabático de ar", "a temperatura do ar", "Aumenta", "O trabalho que entra vira entalpia."],
+  ["uma turbina adiabática de gás", "a temperatura do gás", "Diminui", "O gás entrega trabalho: h e T caem."],
+  ["o aquecedor de um Brayton", "a temperatura do gás", "Aumenta", "O gás recebe calor."],
+  ["o resfriador de um Brayton", "a temperatura do gás", "Diminui", "O gás cede calor ao ambiente."],
+];
+const OPC_D = ["Aumenta", "Diminui", "Permanece constante", "Aumenta e depois diminui"];
+G("e-direcao", 3, () => {
+  const [eq, qt, ok, why] = R.pick(DIRE);
+  return mk({ tpl: "e-direcao", d: 3, q: `Passando por <b>${eq}</b>, o que acontece com <b>${qt}</b>?`, ok, bad: OPC_D.filter((x) => x !== ok), why, hint: why, src: "Lista 4.23 e 1ª lei" });
+});
+G("e-rank-eq", 4, () => {
+  const F = [
+    ["consome a <b>menor</b> potência (em módulo)", "Bomba", "Ela comprime líquido, com v pequeno."],
+    ["produz a <b>maior</b> potência", "Turbina", "Expande vapor: a queda de h é grande."],
+    ["<b>rejeita</b> calor para o ambiente", "Condensador", "O vapor condensa e cede calor."],
+    ["<b>recebe</b> o maior calor", "Caldeira", "Vaporiza e superaquece o fluido."],
+    ["leva o fluido de líquido saturado a líquido comprimido", "Bomba", "A pressão sobe quase sem mudar o estado de líquido."],
+    ["deixa a mistura líquido-vapor na saída (título menor que 1)", "Turbina", "Na expansão o vapor perde entalpia e parte condensa."],
+  ];
+  const [t, ok, why] = R.pick(F), O = ["Bomba", "Turbina", "Caldeira", "Condensador"];
+  return mk({ tpl: "e-rank-eq", d: 4, q: `Num Rankine ideal, qual equipamento ${t}?`, ok, bad: O.filter((x) => x !== ok), why, hint: why, src: "Vídeo R4-119-120" });
+});
+G("e-mist", 4, () => {
+  const [m1, m2] = R.pick([[1, 3], [3, 1], [2, 2], [1, 4], [4, 1], [2, 5], [5, 2]]), agua = Math.random() < 0.5;
+  const T1 = agua ? R.pick([15, 20, 25]) : R.pick([300, 320]), T2 = agua ? R.pick([70, 80, 90]) : R.pick([600, 700]), u = agua ? "°C" : "K";
+  const ok = m1 === m2 ? "Exatamente no meio" : m2 > m1 ? "Mais perto da corrente quente" : "Mais perto da corrente fria";
+  const O = ["Mais perto da corrente quente", "Mais perto da corrente fria", "Exatamente no meio", "Acima da temperatura da corrente quente"];
+  return mk({ tpl: "e-mist", d: 4, q: `Câmara de mistura adiabática (cp constante, ${agua ? "água líquida" : "ar"}): <b>${m1} kg/s</b> a ${T1} ${u} (fria) se junta a <b>${m2} kg/s</b> a ${T2} ${u} (quente). A temperatura de saída fica...`, ok, bad: O.filter((x) => x !== ok),
+    why: `A saída é a média ponderada pelas vazões: fica mais perto de quem tem mais massa. Com ${m1} e ${m2} kg/s: ${ok.toLowerCase()}. Nunca sai fora do intervalo entre as duas.`, hint: "Média ponderada pela vazão.", src: "Lista 4.107" });
+});
+G("e-valv", 8, () => {
+  const P = [{ n: "500 kPa", h: 640.23 }, { n: "1 MPa", h: 762.81 }, { n: "2 MPa", h: 908.79 }], Pf = R.pick(["100 kPa", "50 kPa", "10 kPa"]), [a, b] = R.shuffle(P).slice(0, 2), win = a.h > b.h ? "A" : "B";
+  const O = { A: `A (parte de ${a.n})`, B: `B (parte de ${b.n})`, I: "Iguais, pois nas duas h₂ = h₁", N: "Nenhuma: líquido não vaporiza numa válvula" };
+  return mk({ tpl: "e-valv", d: 8, q: `Duas válvulas adiabáticas levam <b>líquido saturado</b> até <b>${Pf}</b>: a <b>A</b> parte de ${a.n} e a <b>B</b> de ${b.n}. Qual produz mais vapor na saída (maior título)?`, ok: O[win], bad: Object.keys(O).filter((k) => k !== win).map((k) => O[k]),
+    why: "h₂ = h₁ nas duas, mas quem parte de pressão mais alta tem h₁ maior: sobra mais energia para vaporizar na pressão final. Mesmo h₂ = h₁ em cada uma não implica mesmo título: o título depende do h₁ de cada uma.", hint: "Maior h de entrada, mais vapor na saída.", src: "Prova 2 de 03/07, Q3" });
+});
+G("e-troc", 9, () => {
+  const dT = R.pick([100, 200, 400]), r = R.pick([1, 2]), v = dT / (4 * r), f = (x) => "≈ " + fm(x, x % 1 ? 1 : 0) + " K";
+  return mk({ tpl: "e-troc", d: 9, q: `Trocador isolado: ar quente (cp ≈ 1 kJ/kg·K) esfria <b>${dT} K</b> e aquece água líquida (cp ≈ 4 kJ/kg·K). ${r === 1 ? "As duas vazões mássicas são iguais." : "A vazão mássica da água é o <b>dobro</b> da do ar."} Em ordem de grandeza, quanto a água esquenta?`,
+    ok: f(v), bad: [f(dT), f(4 * dT), f(dT / 2)],
+    why: `Q̇ é o mesmo nas duas correntes: ṁ·cp·ΔT. A água tem cp ≈ 4 vezes maior${r === 2 ? " e o dobro da vazão (8 vezes mais capacidade)" : ""}, então esquenta ${r === 2 ? "8" : "4"} vezes menos que o ar esfria: ${f(v)}.`, hint: "Quem tem mais ṁ·cp varia menos de temperatura.", src: "Vídeo T4-91" });
+});
+G("e-perda", 6, () => {
+  const C = [
+    ["Uma turbina a vapor adiabática passa a <b>perder calor</b> para o ambiente, com as <b>mesmas</b> h e V na entrada e na saída. A potência no eixo...", "Diminui", "Ẇ = Q̇ + ṁΔh com Q̇ < 0: sobra menos para o eixo."],
+    ["Uma turbina perdia calor e passa a ser <b>bem isolada</b>, com as <b>mesmas</b> h e V na entrada e na saída. A potência no eixo...", "Aumenta", "Ẇ = Q̇ + ṁΔh: com Q̇ → 0, a perda deixa de descontar."],
+  ];
+  const [q, ok, why] = R.pick(C), O = ["Aumenta", "Diminui", "Permanece constante", "Zera"];
+  return mk({ tpl: "e-perda", d: 6, q, ok, bad: O.filter((x) => x !== ok), why, hint: why, src: "Vídeo T4-84 e 4.118" });
+});
+G("e-bray", 9, () => {
+  const S = [
+    ["A razão de pressão aumenta (T<sub>2</sub> maior), com T<sub>1</sub> e T<sub>3</sub> iguais. O que acontece com Ẇ<sub>c</sub>?", "Aumenta", "Comprimir mais eleva T₂ e o trabalho do compressor."],
+    ["A razão de pressão aumenta (T<sub>2</sub> maior), com T<sub>1</sub> e T<sub>3</sub> iguais. O que acontece com Q̇<sub>H</sub> (calor de 2 → 3)?", "Diminui", "O ar chega mais quente ao aquecedor: o ΔT de 2 → 3 cai."],
+    ["T<sub>3</sub> aumenta, com T<sub>1</sub> e T<sub>2</sub> iguais. O que acontece com Ẇ<sub>c</sub>?", "Permanece constante", "O compressor só enxerga T₁ e T₂."],
+    ["T<sub>3</sub> aumenta, com T<sub>1</sub> e T<sub>2</sub> iguais. O que acontece com Ẇ<sub>T</sub>?", "Aumenta", "A turbina recebe gás mais quente: o ΔT dela cresce."],
+    ["O ar de entrada fica mais quente (T<sub>1</sub> maior), com a mesma razão de pressão. O que acontece com Ẇ<sub>c</sub>?", "Aumenta", "O trabalho de compressão é proporcional à temperatura do gás."],
+    ["A vazão ṁ aumenta, com as mesmas temperaturas. O que acontece com |Q̇<sub>L</sub>|?", "Aumenta", "Todo calor e trabalho são proporcionais a ṁ."],
+    ["Instala-se um regenerador ideal. O que acontece com Q̇<sub>H</sub>?", "Diminui", "O ar chega ao aquecedor já quente (a T₄)."],
+    ["Instala-se um regenerador ideal. O que acontece com Ẇ<sub>líq</sub>?", "Permanece constante", "O regenerador só troca calor internamente: compressor e turbina não mudam."],
+    ["Instala-se um regenerador ideal. O que acontece com |Q̇<sub>L</sub>|?", "Diminui", "O gás quente da turbina entrega calor ao ar antes de ir para o resfriador."],
+  ];
+  const [q, ok, why] = R.pick(S), O = ["Aumenta", "Diminui", "Permanece constante", "Troca de sinal"];
+  return mk({ tpl: "e-bray", d: 9, q: "Brayton com ar (gás ideal, cp constante). " + q, ok, bad: O.filter((x) => x !== ok), why, hint: why, src: "Lousa de 11/11" });
+});
+
+/* ---------------- v3: os antigos geradores de conta viraram estimativa e intuição ---------------- */
+G("e-ke", 3, () => {
+  const V = R.pick([10, 45, 100, 200, 450]), ke = V * V / 2000, f = (x) => "≈ " + fm(x, x < 1 ? 2 : x < 10 ? 1 : 0) + " kJ/kg";
+  return mk({ tpl: "e-ke", d: 3, kind: "num", q: `Um fluido escoa a <b>${V} m/s</b>. Em ordem de grandeza, quanto vale a energia cinética V²/2, em kJ/kg?`,
+    ok: f(ke), bad: [f(ke * 10), f(ke / 10), f(ke * 1000)],
+    why: `Regra de bolso: 45 m/s ≈ 1 kJ/kg, e V² cresce rápido (dobrou V, quadruplicou). Aqui: ${V}²/2 = ${fm(V * V / 2)} J/kg ≈ ${fm(ke, 2)} kJ/kg.`, hint: "45 m/s ≈ 1 kJ/kg; escale com V².", src: "CADERNO_P2_Termo" });
+});
+G("e-gasmassa", 5, () => {
+  const g = [{ n: "ar", R: 0.287 }, { n: "hélio", R: 2.077 }, { n: "CO₂", R: 0.1889 }];
+  if (Math.random() < 0.5) {
+    const [a, b] = R.shuffle(g).slice(0, 2), win = a.R < b.R ? a : b, O = { a: `${cap(a.n)}`, b: `${cap(b.n)}`, i: "Iguais, pois V̇, P e T são iguais", n: "Não dá para saber sem a massa molar" };
+    return mk({ tpl: "e-gasmassa", d: 5, kind: "num", q: `<b>${cap(a.n)}</b> e <b>${b.n}</b> escoam com a mesma P, a mesma T e a mesma vazão volumétrica. Qual tem a <b>maior vazão mássica</b>?`, ok: cap(win.n), bad: [cap((win === a ? b : a).n), O.i, O.n],
+      why: "ṁ = PV̇/(RT): com P, V̇ e T iguais, ṁ é inversamente proporcional a R. O gás com menor R (mais pesado) leva mais massa.", hint: "ṁ = PV̇/(RT): quanto maior R, menor ṁ.", src: "Prova 2 de 03/07, Q2" });
+  }
+  const T1 = R.pick([300, 320]), T2 = R.pick([600, 640]);
+  return mk({ tpl: "e-gasmassa", d: 5, kind: "num", q: `Ar com a mesma P e a mesma vazão volumétrica entra a <b>${T1} K</b> (caso A) ou a <b>${T2} K</b> (caso B). Qual caso tem a <b>maior vazão mássica</b>?`, ok: `A (${T1} K): o ar frio é mais denso`, bad: [`B (${T2} K): o ar quente tem mais energia`, "Iguais, pois V̇ e P são iguais", `B (${T2} K): ṁ cresce com T`],
+    why: "ṁ = PV̇/(RT): ṁ cai quando T (em kelvin) sobe. O ar frio é mais denso e leva mais massa na mesma vazão volumétrica.", hint: "Quanto mais frio, mais denso.", src: "Prova 2 de 03/07, Q2" });
+});
+G("e-titulo", 4, () => {
+  const x = R.pick([0.1, 0.2, 0.5, 0.8, 0.9]), ok = x < 0.5 ? "Mais perto de h<sub>l</sub> (quase tudo líquido)" : x > 0.5 ? "Mais perto de h<sub>v</sub> (quase tudo vapor)" : "No meio entre h<sub>l</sub> e h<sub>v</sub>";
+  const O = ["Mais perto de h<sub>l</sub> (quase tudo líquido)", "Mais perto de h<sub>v</sub> (quase tudo vapor)", "No meio entre h<sub>l</sub> e h<sub>v</sub>", "Acima de h<sub>v</sub>"];
+  return mk({ tpl: "e-titulo", d: 4, q: `Água saturada a 10 kPa com título <b>x = ${fm(x, 1)}</b>. Onde fica h entre h<sub>l</sub> e h<sub>v</sub>?`, ok, bad: O.filter((o) => o !== ok),
+    why: `h = h<sub>l</sub> + x·h<sub>lv</sub> varia linearmente com x. Com x = ${fm(x, 1)}, h fica ${x < 0.5 ? "perto de h<sub>l</sub>" : x > 0.5 ? "perto de h<sub>v</sub>" : "no meio"}; nunca passa de h<sub>v</sub> dentro do domo.`, hint: "h é linear em x.", src: "Vídeo R4-118, Passo 3" });
+});
+G("e-interp", 3, () => {
+  const T = R.pick([455, 470, 475, 480, 495]), ok = T < 475 ? "Mais perto de h(450 °C)" : T > 475 ? "Mais perto de h(500 °C)" : "Exatamente no meio";
+  const O = ["Mais perto de h(450 °C)", "Mais perto de h(500 °C)", "Exatamente no meio", "Fora do intervalo entre h(450 °C) e h(500 °C)"];
+  return mk({ tpl: "e-interp", d: 3, q: `Numa tabela, h está dado a 450 °C e a 500 °C, na mesma pressão. Interpolando para <b>${T} °C</b>, o valor de h fica...`, ok, bad: O.filter((o) => o !== ok),
+    why: `A fração do caminho é (${T} − 450)/50 = ${fm((T - 450) / 50, 1)}: h fica ${ok.toLowerCase()}. Interpolar nunca sai do intervalo entre os dois valores.`, hint: "Fração = (T − 450)/50.", src: "Vídeo R4-118, Passo 2" });
+});
+G("e-prod", 5, () => {
+  const eq = R.pick([["uma turbina de ar", "a potência"], ["um compressor de ar", "a potência de acionamento"], ["um aquecedor de gás", "o calor recebido"], ["um resfriador de gás", "o calor rejeitado"]]);
+  const F = [0.5, 1, 2], a = R.pick(F), b = R.pick(F);
+  if (a === 1 && b === 1) return null;
+  const tx = (v) => (v === 2 ? "dobra" : v === 0.5 ? "cai pela metade" : "fica igual"), p = a * b;
+  const L = { 0.25: "Cai a um quarto", 0.5: "Cai pela metade", 1: "Não muda", 2: "Dobra", 4: "Quadruplica" };
+  return mk({ tpl: "e-prod", d: 5, kind: "num", q: `Em ${eq[0]} (gás ideal, cp constante), a vazão ṁ ${tx(a)} e a variação de temperatura ΔT ${tx(b)}. O que acontece com ${eq[1]}?`, ok: L[p], bad: Object.keys(L).filter((k) => +k !== p).map((k) => L[k]),
+    why: `A grandeza é ṁ·cp·ΔT: os fatores se multiplicam. ${fm(a, a % 1 ? 1 : 0)} × ${fm(b, b % 1 ? 1 : 0)} = ${fm(p, p % 1 ? 2 : 0)}.`.replace(/\./g, (m, i, s) => m), hint: "ṁ·cp·ΔT: multiplique os fatores.", src: "Vídeo T4-46" });
+});
+G("e-compke", 6, () => {
+  const S = [
+    ["Um compressor de ar adiabático entrega o ar a alta velocidade (a energia cinética de saída é relevante). A potência de acionamento, comparada com ṁ·cp·ΔT, é...", "Maior", "Parte do trabalho vira energia cinética, além de entalpia."],
+    ["Uma turbina a vapor descarrega o vapor ainda em alta velocidade. A potência no eixo, comparada com ṁ(h<sub>e</sub> − h<sub>s</sub>), é...", "Menor", "Parte da queda de h sai como energia cinética do vapor."],
+    ["Uma turbina recebe o vapor já em alta velocidade e o descarrega devagar. A potência, comparada com ṁ(h<sub>e</sub> − h<sub>s</sub>), é...", "Maior", "A energia cinética que entra também vira trabalho."],
+  ];
+  const [q, ok, why] = R.pick(S), O = ["Maior", "Menor", "Igual", "Zero"];
+  return mk({ tpl: "e-compke", d: 6, q, ok, bad: O.filter((x) => x !== ok), why, hint: why, src: "Vídeos T4-56 e T4-84" });
+});
+G("e-extrac", 8, () => {
+  const S = [
+    ["Numa turbina a vapor com uma extração, aumenta-se a fração extraída (mesma ṁ de entrada, mesmas entalpias). A potência...", "Diminui", "O vapor extraído não expande até a saída: entrega menos trabalho que o que segue."],
+    ["A extração passa a ser feita numa pressão mais alta (h maior), com a mesma vazão extraída. A potência...", "Diminui", "Esse vapor sai da turbina mais cedo, tendo expandido menos."],
+    ["Elimina-se a extração: todo o vapor expande até a saída. A potência...", "Aumenta", "Todo o vapor passa a render a queda de entalpia completa."],
+  ];
+  const [q, ok, why] = R.pick(S), O = ["Aumenta", "Diminui", "Permanece constante", "Zera"];
+  return mk({ tpl: "e-extrac", d: 8, q, ok, bad: O.filter((x) => x !== ok), why, hint: why, src: "Vídeo T4-84" });
+});
+G("e-cond", 6, () => {
+  const S = [
+    ["Um condensador de vapor é resfriado por água. Se a água puder esquentar mais (ΔT maior), a vazão de água necessária...", "Diminui", "O mesmo calor passa a ser levado por menos massa: Q̇ = ṁ·cp·ΔT."],
+    ["O vapor entra no condensador com título maior (mais vapor, menos líquido), mesma ṁ. A vazão de água necessária...", "Aumenta", "Há mais calor a retirar para chegar a líquido saturado."],
+    ["A vazão de vapor dobra, com os mesmos estados e o mesmo ΔT da água. A vazão de água necessária...", "Aumenta", "O calor rejeitado dobra, então a água também."],
+  ];
+  const [q, ok, why] = R.pick(S), O = ["Aumenta", "Diminui", "Permanece constante", "Zera"];
+  return mk({ tpl: "e-cond", d: 6, q, ok, bad: O.filter((x) => x !== ok), why, hint: why, src: "Vídeos T4-91 e R4-119" });
+});
+G("e-fecha", 7, () => {
+  const e = R.pick([0.25, 0.3, 0.35, 0.4]);
+  return mk({ tpl: "e-fecha", d: 7, kind: "num", q: `Num ciclo em regime permanente, Q̇<sub>H</sub> = 100 kW e Ẇ<sub>líq</sub> = ${fm(e * 100)} kW. O calor rejeitado |Q̇<sub>L</sub>| é...`, ok: "Menor que Q̇<sub>H</sub>, mas maior que Ẇ<sub>líq</sub>",
+    bad: ["Igual a Ẇ<sub>líq</sub>", "Maior que Q̇<sub>H</sub>", "Zero, pois o ciclo converte tudo em trabalho"],
+    why: `ΣQ̇ = ΣẆ: |Q̇<sub>L</sub>| = Q̇<sub>H</sub> − Ẇ<sub>líq</sub> = ${fm(100 - e * 100)} kW. Como η < 50 %, rejeita-se mais do que se converte.`, hint: "Calor líquido = potência líquida.", src: "Quadro e lousa" });
+});
+G("e-eta-faixa", 7, () => {
+  const S = [
+    ["uma usina a vapor (Rankine)", "≈ 30 a 40 %", ["≈ 80 a 90 %", "≈ 5 %", "≈ 100 %"]],
+    ["uma turbina a gás (Brayton simples)", "≈ 25 a 40 %", ["≈ 80 a 90 %", "≈ 5 %", "≈ 100 %"]],
+    ["uma máquina de Carnot entre 300 K e 1500 K", "≈ 80 %", ["≈ 30 %", "≈ 5 %", "≈ 100 %"]],
+    ["uma máquina de Carnot entre 300 K e 600 K", "≈ 50 %", ["≈ 20 %", "≈ 80 %", "≈ 100 %"]],
+  ];
+  const [t, ok, bad] = R.pick(S);
+  return mk({ tpl: "e-eta-faixa", d: 7, kind: "num", q: `Qual é a ordem de grandeza da eficiência térmica de <b>${t}</b>?`, ok, bad,
+    why: "Máquinas reais de potência ficam em 30 a 40 %. Carnot é o teto: η = 1 − T<sub>L</sub>/T<sub>H</sub> (ex.: 1 − 300/1500 = 80 %).", hint: "Carnot é o teto; máquinas reais ficam bem abaixo.", src: "Lousa de 11/11" });
+});
+G("e-carnot", 9, () => {
+  const TH = R.pick([600, 900, 1500, 3000]), eC = Math.round((1 - 300 / TH) * 100) / 100, imp = Math.round((eC + 0.05) * 100) / 100, f = (x) => "η = " + fm(x, 2);
+  return mk({ tpl: "e-carnot", d: 9, kind: "num", q: `Qual dessas máquinas térmicas, operando entre <b>${TH} K</b> e <b>300 K</b>, é <b>impossível</b>?`, ok: f(imp), bad: [f(eC - 0.1), f(eC - 0.2), f(eC - 0.3)],
+    why: `O teto é Carnot: η = 1 − 300/${TH} ≈ ${fm(eC, 2)}. Só ${f(imp)} passa dele.`, hint: "Nenhuma máquina supera 1 − TL/TH.", src: "Lousa de 11/11" });
 });
 
 function retry(g) { for (let i = 0; i < 40; i++) { const q = g.fn(); if (q) return q; } return null; }

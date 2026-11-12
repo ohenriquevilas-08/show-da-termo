@@ -1,7 +1,7 @@
 const B = require("../perguntas.js");
 let bad = 0, total = 0, per = {};
 for (const g of B.ALL) {
-  const n = g.tpl.startsWith("n-") ? 400 : 5;
+  const n = g.tpl.startsWith("c-") ? 5 : 400;
   for (let i = 0; i < n; i++) {
     const q = B.retry(g); total++;
     if (!q) { console.log("NULL", g.tpl); bad++; continue; }
